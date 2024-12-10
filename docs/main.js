@@ -75,9 +75,38 @@ function onHover(event) {
     outlinePass.selectedObjects = []; // clear the outline when not hovering over any planet
   }
 }
-/* for animation, dblclick event listener and handler */
-window.addEventListener('dblclick', onDoubleClick, false);
-function onDoubleClick(event) {
+
+let isDragging = false;
+let startX, startY;
+const dragThreshold = 5; // pixel distance to detect a drag
+
+/* set starting position for a potential drag */
+window.addEventListener("mousedown", (event) => {
+  startX = event.clientX;
+  startY = event.clientY;
+  isDragging = false;
+});
+
+/* detect dragging if mouse has moved enough from starting position */
+window.addEventListener("mousemove", (event) => {
+  const deltaX = Math.abs(event.clientX - startX);
+  const deltaY = Math.abs(event.clientY - startY);
+
+  if (deltaX > dragThreshold || deltaY > dragThreshold) {
+    isDragging = true; // if the mouse moves enough, detect drag
+  }
+});
+
+/* trigger click only if user was not dragging */
+window.addEventListener("mouseup", (event) => {
+  if (!isDragging) {
+    onClick(event);
+  }
+  isDragging = false;
+});
+
+/* for animation, click event listener and handler */
+function onClick(event) {
   // Convert mouse position to normalized device coordinates
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -92,6 +121,7 @@ function onDoubleClick(event) {
     }
   }
 }
+
 /* to close sidebar, onclick listener/handler on exit-btn */
 document.getElementById('exit-btn').addEventListener('click', () => {
   closeSidebar();
